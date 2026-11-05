@@ -5,12 +5,14 @@ from pathlib import Path
 import yaml
 
 from .errors import ConfigError
-from .toml import to_toml
+from .render import to_ini, to_toml
 
 
 @dataclass(frozen=True, slots=True)
 class PythonSettings:
     ruff_toml: str
+    mypy_enabled: bool
+    mypy_ini: str
     blank_lines_around_blocks: bool
     blank_line_before_block_comment: bool
     blank_line_before_except: bool
@@ -97,9 +99,14 @@ def parse_python(raw: dict[str, object], path: Path) -> PythonSettings:
     spacing = section(raw, "spacing", path)
     checks = section(raw, "checks", path)
     ruff = section(raw, "ruff", path)
+    mypy = section(raw, "mypy", path)
+    mypy_config = section(mypy, "config", path)
 
     return PythonSettings(
         ruff_toml="".join(f"{key} = {to_toml(value)}\n" for key, value in ruff.items()),
+        mypy_enabled=boolean(mypy, "enabled", path),
+        mypy_ini="[mypy]\n"
+        + "".join(f"{key} = {to_ini(value)}\n" for key, value in mypy_config.items()),
         blank_lines_around_blocks=boolean(spacing, "around_blocks", path),
         blank_line_before_block_comment=boolean(spacing, "before_block_comment", path),
         blank_line_before_except=boolean(spacing, "before_except", path),

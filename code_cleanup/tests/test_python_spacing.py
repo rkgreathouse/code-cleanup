@@ -7,6 +7,8 @@ from ..settings import PythonSettings
 def make_settings() -> PythonSettings:
     return PythonSettings(
         ruff_toml="",
+        mypy_enabled=False,
+        mypy_ini="",
         blank_lines_around_blocks=True,
         blank_line_before_block_comment=True,
         blank_line_before_except=True,

@@ -29,6 +29,14 @@ python:
     allow_docstrings: false
     max_module_constants: 2
 
+  # Runs once over the cleaned files, after ruff; uses ROOT/.venv for third-party
+  # packages when it exists.
+  mypy:
+    enabled: true
+    config:
+      strict: true
+      python_version: "3.14"
+
   # Written to a generated ruff.toml passed with --config, so a project's own ruff
   # settings never change the result.
   ruff:

@@ -1,7 +1,7 @@
 import pytest
 
 from ..errors import ConfigError
-from ..toml import to_toml
+from ..render import to_ini, to_toml
 
 
 def test_renders_nested_values_as_inline_toml() -> None:
@@ -16,3 +16,11 @@ def test_renders_nested_values_as_inline_toml() -> None:
 def test_rejects_values_toml_cannot_hold() -> None:
     with pytest.raises(ConfigError):
         to_toml(None)
+
+
+def test_renders_ini_values_the_way_mypy_reads_them() -> None:
+    assert [to_ini(True), to_ini("3.14"), to_ini(["a", "b"])] == [
+        "True",
+        "3.14",
+        "a, b",
+    ]

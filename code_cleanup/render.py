@@ -23,3 +23,16 @@ def to_toml(value: object) -> str:
         return "{ " + ", ".join(pairs) + " }"
 
     raise ConfigError(f"cannot pass {value!r} to a tool as a setting")
+
+
+def to_ini(value: object) -> str:
+    if isinstance(value, bool):
+        return "True" if value else "False"
+
+    if isinstance(value, list):
+        return ", ".join(to_ini(item) for item in value)
+
+    if isinstance(value, str | int | float):
+        return str(value)
+
+    raise ConfigError(f"cannot pass {value!r} to a tool as a setting")

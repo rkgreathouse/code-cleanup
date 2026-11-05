@@ -4,6 +4,7 @@ from pathlib import Path
 from ..findings import Cleaned, Finding
 from ..settings import Settings
 from .checks import find_style_issues
+from .mypy import find_type_errors
 from .ruff import find_lint, fix_lint, format_code
 from .spacing import space_blocks
 
@@ -34,3 +35,22 @@ def to_syntax_finding(error: SyntaxError) -> Finding:
         message=f"syntax error, file left as is: {error.msg}",
         is_error=True,
     )
+
+
+def check_python_project(
+    root: Path, texts: dict[Path, str], settings: Settings
+) -> dict[Path, list[Finding]]:
+    # a file that does not parse is already reported, and would stop mypy outright
+    parsed = {path: text for path, text in texts.items() if parses(text)}
+
+    return find_type_errors(root, parsed, settings.python)
+
+
+def parses(text: str) -> bool:
+    try:
+        ast.parse(text)
+
+    except SyntaxError:
+        return False
+
+    return True

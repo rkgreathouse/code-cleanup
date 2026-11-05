@@ -6,7 +6,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.14"
-dependencies = ["pyyaml>=6.0", "ruff==0.17.3"]
+dependencies = ["pyyaml>=6.0", "ruff==0.17.3", "taplo==0.9.3"]
 classifiers = [
     "Environment :: Console",
     "Programming Language :: Python :: 3.14",
@@ -39,8 +39,25 @@ extend-exclude = ["examples"]
 preview = true
 explicit-preview-rules = true
 select = [
-    "E", "W", "F", "I", "N", "UP", "B", "SIM", "PTH", "RET",
-    "ANN", "T20", "TID", "C90", "ERA", "G", "LOG", "PLW0603", "PLR1702",
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "SIM",
+    "PTH",
+    "RET",
+    "ANN",
+    "T20",
+    "TID",
+    "C90",
+    "ERA",
+    "G",
+    "LOG",
+    "PLW0603",
+    "PLR1702",
 ]
 ignore = ["TID252"]
 

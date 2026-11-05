@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 
 from .errors import ConfigError
-from .render import to_ini, to_toml
+from .render import to_ini, to_option, to_toml
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +33,12 @@ class IgnoreSettings:
 
 
 @dataclass(frozen=True, slots=True)
+class TomlSettings:
+    taplo_options: tuple[str, ...]
+    blank_line_before_tables: bool
+
+
+@dataclass(frozen=True, slots=True)
 class Settings:
     profile: str
     exclude: tuple[str, ...]
@@ -40,6 +46,7 @@ class Settings:
     max_lines: int
     python: PythonSettings
     ignore: IgnoreSettings
+    toml: TomlSettings
 
 
 def load_settings(root: Path, config_path: Path | None) -> Settings:
@@ -110,6 +117,18 @@ def parse_settings(raw: dict[str, object], path: Path) -> Settings:
         max_lines=integer(file_length, "max", path),
         python=parse_python(section(raw, "python", path), path),
         ignore=parse_ignore(section(raw, "ignore", path), path),
+        toml=parse_toml(section(raw, "toml", path), path),
+    )
+
+
+def parse_toml(raw: dict[str, object], path: Path) -> TomlSettings:
+    taplo = section(raw, "taplo", path)
+
+    return TomlSettings(
+        taplo_options=tuple(
+            f"{key}={to_option(value)}" for key, value in taplo.items()
+        ),
+        blank_line_before_tables=boolean(raw, "blank_line_before_tables", path),
     )
 
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from ..comments import space_comment
 from ..findings import Cleaned, Finding
 from ..settings import Settings
 
@@ -69,13 +70,6 @@ def drop_repeats(blocks: list[list[str]]) -> list[list[str]]:
             kept.append(lines)
 
     return kept
-
-
-def space_comment(line: str) -> str:
-    if line.startswith("#") and len(line) > 1 and line[1].isalnum():
-        return "# " + line[1:]
-
-    return line
 
 
 def sort_block(block: list[str]) -> list[str]:

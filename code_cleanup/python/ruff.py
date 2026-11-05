@@ -1,14 +1,13 @@
 import hashlib
 import json
 import subprocess
-import sys
-import sysconfig
 import tempfile
 from pathlib import Path
 
 from ..errors import RuffError
 from ..findings import Finding
 from ..settings import PythonSettings
+from ..tools import find_tool
 
 
 def fix_lint(text: str, path: Path, settings: PythonSettings) -> str:
@@ -29,7 +28,7 @@ def find_lint(text: str, path: Path, settings: PythonSettings) -> list[Finding]:
 
 def run_ruff(args: list[str], text: str, path: Path, settings: PythonSettings) -> str:
     config_path = write_ruff_config(settings.ruff_toml)
-    command = [*find_ruff(), *args, "--config", str(config_path)]
+    command = [find_tool("ruff"), *args, "--config", str(config_path)]
 
     result = subprocess.run(
         [*command, "--stdin-filename", str(path.resolve()), "-"],
@@ -43,17 +42,6 @@ def run_ruff(args: list[str], text: str, path: Path, settings: PythonSettings) -
         raise RuffError(f"ruff {args[0]} failed on {path}: {result.stderr.strip()}")
 
     return result.stdout
-
-
-def find_ruff() -> list[str]:
-    name = "ruff.exe" if sys.platform == "win32" else "ruff"
-    binary = Path(sysconfig.get_path("scripts")) / name
-
-    # calling the binary skips a Python start-up per call; -m ruff finds it anywhere
-    if binary.is_file():
-        return [str(binary)]
-
-    return [sys.executable, "-m", "ruff"]
 
 
 def write_ruff_config(ruff_toml: str) -> Path:

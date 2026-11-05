@@ -36,3 +36,13 @@ def to_ini(value: object) -> str:
         return str(value)
 
     raise ConfigError(f"cannot pass {value!r} to a tool as a setting")
+
+
+def to_option(value: object) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+
+    if isinstance(value, str | int):
+        return str(value)
+
+    raise ConfigError(f"cannot pass {value!r} to a tool as an option")

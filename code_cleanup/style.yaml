@@ -26,6 +26,14 @@ ignore:
   sort_blocks: true
   require_headers: true
 
+# taplo formats; then a blank line goes above every [table] and its comments
+toml:
+  blank_line_before_tables: true
+  taplo:
+    indent_string: "    "
+    column_width: 88
+    allowed_blank_lines: 1
+
 python:
   spacing:
     around_blocks: true

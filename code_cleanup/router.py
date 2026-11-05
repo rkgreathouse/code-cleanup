@@ -6,6 +6,7 @@ from .findings import Cleaned, Finding
 from .ignore.clean import clean_ignore
 from .python.clean import check_python_project, clean_python
 from .settings import Settings
+from .toml.clean import clean_toml
 
 type ProjectCheck = Callable[
     [Path, dict[Path, str], Settings], dict[Path, list[Finding]]
@@ -28,6 +29,13 @@ LANGUAGES = (
         names=(),
         clean=clean_python,
         check_project=check_python_project,
+    ),
+    Language(
+        name="toml",
+        suffixes=(".toml",),
+        names=(),
+        clean=clean_toml,
+        check_project=None,
     ),
     Language(
         name="ignore",

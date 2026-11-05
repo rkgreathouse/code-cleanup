@@ -5,7 +5,10 @@ from pathlib import Path
 import yaml
 
 from .errors import ConfigError
+from .project import find_minimum_python
 from .render import to_ini, to_option, to_toml
+
+MYPY_OLDEST = (3, 10)
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,11 +59,29 @@ def load_settings(root: Path, config_path: Path | None) -> Settings:
         files("code_cleanup").joinpath("style.yaml").read_text(), "style.yaml"
     )
     project_path = config_path or root / ".code-cleanup.yaml"
+    raw = merge(raw, target_python(root))
 
     if config_path is not None or project_path.is_file():
         raw = merge(raw, read_yaml(project_path))
 
     return parse_settings(raw, project_path)
+
+
+def target_python(root: Path) -> dict[str, object]:
+    version = find_minimum_python(root)
+
+    if version is None:
+        return {}
+
+    major, minor = version
+    checked = max(version, MYPY_OLDEST)
+
+    return {
+        "python": {
+            "ruff": {"target-version": f"py{major}{minor}"},
+            "mypy": {"config": {"python_version": f"{checked[0]}.{checked[1]}"}},
+        }
+    }
 
 
 def read_yaml(path: Path) -> dict[str, object]:

@@ -52,3 +52,23 @@ def test_profile_must_be_known(tmp_path: Path) -> None:
 
     with pytest.raises(ConfigError, match="profile must be none or cli"):
         load_settings(tmp_path, None)
+
+
+def test_targets_the_projects_oldest_python(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text('[project]\nrequires-python = ">=3.8"\n')
+
+    python = load_settings(tmp_path, None).python
+
+    assert 'target-version = "py38"\n' in python.ruff_toml
+    assert "python_version = 3.10\n" in python.mypy_ini
+
+
+def test_an_explicit_target_in_the_project_file_wins(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text('[project]\nrequires-python = ">=3.8"\n')
+    (tmp_path / ".code-cleanup.yaml").write_text(
+        "python:\n  ruff:\n    target-version: py312\n"
+    )
+
+    assert (
+        'target-version = "py312"\n' in load_settings(tmp_path, None).python.ruff_toml
+    )

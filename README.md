@@ -84,6 +84,8 @@ A `service` profile (JSON logs, REST layout) comes with the Java work.
 | `CC102` | more than two UPPER_CASE module constants; move the rest to config | |
 | `CC103` | a docstring; names and small functions carry the meaning | |
 | `CC104` | reads the environment; take a flag or config.yaml instead | |
+| `CC105` | comprehension with more than one `for` or `if`, or nested; use a loop | |
+| `CC106` | warning: a value only tested once; use `if x := ...` | |
 | `CC201` | `logging.basicConfig` outside `__main__.py` | |
 | `CC202` | logger not named `getLogger("<tool>")` (entry) / `getLogger(__name__)` | |
 | `CC203` | `basicConfig` without the house `format` and `datefmt` | |

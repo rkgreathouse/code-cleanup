@@ -50,7 +50,7 @@ def test_merge_replaces_lists_and_merges_mappings() -> None:
 def test_profile_must_be_known(tmp_path: Path) -> None:
     (tmp_path / ".code-cleanup.yaml").write_text("profile: webapp\n")
 
-    with pytest.raises(ConfigError, match="profile must be none or cli"):
+    with pytest.raises(ConfigError, match="profile must be one of none, cli, service"):
         load_settings(tmp_path, None)
 
 
@@ -72,3 +72,21 @@ def test_an_explicit_target_in_the_project_file_wins(tmp_path: Path) -> None:
     assert (
         'target-version = "py312"\n' in load_settings(tmp_path, None).python.ruff_toml
     )
+
+
+def test_targets_the_release_the_pom_compiles_for(tmp_path: Path) -> None:
+    (tmp_path / "pom.xml").write_text(
+        "<project><properties><java.version>17</java.version></properties></project>"
+    )
+
+    assert load_settings(tmp_path, None).java.release == 17
+
+
+def test_passes_error_prone_severities_as_flags(tmp_path: Path) -> None:
+    (tmp_path / ".code-cleanup.yaml").write_text(
+        'java:\n  error_prone:\n    checks:\n      UnusedVariable: "OFF"\n'
+    )
+
+    java = load_settings(tmp_path, None).java
+
+    assert "-Xep:UnusedVariable:OFF" in java.error_prone_flags

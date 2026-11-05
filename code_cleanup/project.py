@@ -7,6 +7,10 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 MINIMUM = re.compile(r"(?:>=|~=|==)\s*(\d+)\.(\d+)")
+JAVA_RELEASE = re.compile(
+    r"<(maven\.compiler\.release|java\.version|release|maven\.compiler\.target)>"
+    r"\s*(?:1\.)?(\d+)\s*</\1>"
+)
 
 
 def find_minimum_python(root: Path) -> tuple[int, int] | None:
@@ -63,3 +67,18 @@ def read_setup_py(path: Path) -> str:
 def parse_minimum(specifier: str) -> tuple[int, int] | None:
     match = MINIMUM.search(specifier)
     return (int(match.group(1)), int(match.group(2))) if match else None
+
+
+def find_java_release(root: Path) -> int | None:
+    pom = root / "pom.xml"
+
+    if not pom.is_file():
+        return None
+
+    # the release the project compiles for; checking for a newer one would pass code
+    # its own build rejects
+    if match := JAVA_RELEASE.search(pom.read_text()):
+        log.debug("%s targets Java %s", pom, match.group(2))
+        return int(match.group(2))
+
+    return None

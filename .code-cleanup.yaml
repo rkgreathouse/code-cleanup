@@ -1,6 +1,7 @@
 profile: cli
 
-# examples/ holds code as written before cleaning; tests compare it, the repo check skips it
+# examples/ holds code as written before cleaning; tests compare it, the repo check skips
+# it. docs/java-style/example is a service checked on its own (profile: service).
 exclude:
   - .git
   - .venv
@@ -13,3 +14,4 @@ exclude:
   - .gradle
   - .idea
   - examples
+  - example

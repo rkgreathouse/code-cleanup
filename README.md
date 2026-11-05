@@ -20,10 +20,11 @@ plugin claims are skipped.
 | Plugin | Files | Status |
 |---|---|---|
 | Python | `*.py`, `*.pyi` | done |
+| Java (Spring REST services) | `*.java` | done |
 | TOML | `*.toml` | done |
 | Ignore files | `.gitignore`, `.dockerignore` | done |
-| Java, TypeScript, Kotlin | | next, built on the Python rules |
-| YAML (Spring config), log4j | | planned |
+| TypeScript, Kotlin | | next, built on the Python rules |
+| YAML (`application.yml`), log4j2 XML | | planned; the service profile checks they exist |
 
 See [examples/tictactoe](examples/tictactoe/) for a real before/after run with screenshots.
 
@@ -51,6 +52,24 @@ third-party packages when present.
 - ruff's safe fixes, for example `Optional[str]` to `str | None`, and f-strings in
   log calls to lazy `"%s", value` arguments.
 
+### Java
+
+Needs a JDK 21+ and Maven on `PATH`. The Java tools are pinned by Maven coordinate
+in the style and resolved through Maven once, into `~/.cache/code-cleanup/java`.
+
+1. **google-java-format** 2.0.0 (2-space indent, 100 columns, no options) formats.
+2. **Our fixes**: the Python spacing rules: a blank line around every block,
+   before `} catch` / `} finally`, and above a comment that opens a block; none
+   opening a block otherwise.
+3. **Checks**: our `CC` rules per file; then over all cleaned files at once
+   **Checkstyle** 14.4.0 (rules rendered from `java.checkstyle` in the style) and
+   **Error Prone** 2.52.0, which compiles each Maven module's cleaned sources
+   against the classpath from `mvn dependency:build-classpath`. The release comes
+   from the project's `pom.xml` (`maven.compiler.release`, `java.version`), else 21.
+
+The style for Java code is [docs/java-style](docs/java-style/SKILL.md), with a
+complete example service in [docs/java-style/example](docs/java-style/example/).
+
 ### TOML
 
 taplo (pinned) formats with a 4-space indent and width 88; then a blank line goes
@@ -72,7 +91,10 @@ makes order matter, so the set of ignored files never changes.
   `python -m <tool>`, an entry module of a fixed shape, `errors.py`, and tests that
   mirror modules.
 
-A `service` profile (JSON logs, REST layout) comes with the Java work.
+- `service`: also the java-style Spring REST layout (`CC3xx`, `CC203`, `CC402`):
+  Maven layout, one `Application` entry class, an `errors` package with a
+  `@RestControllerAdvice`, controller → service → repository, tests that mirror
+  classes, JSON logs through `log4j2-spring.xml`, settings in `application.yml`.
 
 ## Codes
 
@@ -81,21 +103,26 @@ A `service` profile (JSON logs, REST layout) comes with the Java work.
 | `CC000` | syntax error; the file is left as is | |
 | `CC001` | file over 350 lines (warning) or 400 lines (error) | |
 | `CC101` | absolute import of the own package | yes, for `from` imports |
-| `CC102` | more than two UPPER_CASE module constants; move the rest to config | |
-| `CC103` | a docstring; names and small functions carry the meaning | |
-| `CC104` | reads the environment; take a flag or config.yaml instead | |
-| `CC105` | comprehension with more than one `for` or `if`, or nested; use a loop | |
+| `CC102` | more than two UPPER_CASE module constants (Java: `static final` per file); move the rest to config | |
+| `CC103` | a docstring or Javadoc; names and small functions carry the meaning | |
+| `CC104` | reads the environment (Java: also `System.getProperty`, `@Value`); take a flag or config file instead | |
+| `CC105` | comprehension with more than one `for` or `if`, or nested (Java: stream with more than one `map` or `filter`, a `flatMap`, or a nested stream); use a loop | |
 | `CC106` | warning: a value only tested once; use `if x := ...` | |
-| `CC201` | `logging.basicConfig` outside `__main__.py` | |
-| `CC202` | logger not named `getLogger("<tool>")` (entry) / `getLogger(__name__)` | |
-| `CC203` | `basicConfig` without the house `format` and `datefmt` | |
-| `CC301` | module at the repo root (`profile: cli`) | |
-| `CC302` | module with functions but no `tests/test_<module>.py` (`profile: cli`) | |
-| `CC303` | entry module shape: `main() -> int`, frozen `Options`, `raise SystemExit(main())` | |
-| `CC304` | no `errors.py` with a `ToolError(Exception)` base (`profile: cli`) | |
-| `CC305` | a tool imports another tool; share through `utils` (`profile: cli`) | |
+| `CC107` | Java: nested more than 4 blocks deep | |
+| `CC201` | `logging.basicConfig` outside `__main__.py`; Java: configures logging in code | |
+| `CC202` | logger not named `getLogger("<tool>")` (entry) / `getLogger(__name__)`; Java: not `private static final Logger log = LoggerFactory.getLogger(This.class)` | |
+| `CC203` | `basicConfig` without the house `format` and `datefmt`; Java: no JSON `log4j2-spring.xml` (`profile: service`) | |
+| `CC204` | Java: log message built with `+` or `String.format`; use `{}` | |
+| `CC301` | module at the repo root (`profile: cli`); Java source outside `src/{main,test}/java` (`profile: service`) | |
+| `CC302` | module with functions but no `tests/test_<module>.py` (`profile: cli`); class with methods but no `<Class>Test` (`profile: service`) | |
+| `CC303` | entry module shape: `main() -> int`, frozen `Options`, `raise SystemExit(main())`; Java: one `Application` that only runs Spring, at the root package | |
+| `CC304` | no `errors.py` with a `ToolError(Exception)` base (`profile: cli`); Java: no `errors` package with a `RuntimeException` base and a `@RestControllerAdvice` (`profile: service`) | |
+| `CC305` | a tool imports another tool; share through `utils` (`profile: cli`); Java: a feature imports another feature's controller or repository (`profile: service`) | |
+| `CC306` | a controller uses a repository; call a service (`profile: service`) | |
 | `CC401` | ignore-file block without a `# comment` header | |
+| `CC402` | `application.properties`, or no `application.yml` (`profile: service`) | |
 | `mypy:*` | mypy error codes | |
+| `checkstyle:*`, `errorprone:*`, `javac` | Checkstyle modules, Error Prone bug patterns, compile errors | |
 | others | ruff rule codes | some |
 
 Warnings never fail a run. Errors fail both modes; `--check` also fails when any
@@ -133,4 +160,11 @@ uv run code-cleanup .
 uv run mypy .
 uv run pytest
 uv run code-cleanup --help
+```
+
+The Java example service is checked on its own, under `profile: service`:
+
+```sh
+uv run code-cleanup --check docs/java-style/example
+(cd docs/java-style/example && mvn verify)
 ```

@@ -3,6 +3,10 @@
 - Write all Python here to the `python-style` skill. It lives in the
   `rkgreathouse/setup` repo at `claude/dot-claude/skills/python-style/`; read its
   `SKILL.md` and `example/` before changing code.
+- Java code that code-cleanup checks is written to the `java-style` skill, kept in
+  this repo for now at `docs/java-style/` (`SKILL.md` and `example/`). Java covers
+  Spring REST services only (`profile: service`); there is no Java CLI layout yet.
+  `uv run code-cleanup --check docs/java-style/example` must stay clean too.
 - The plan and design decisions live in `rkgreathouse/setup` at
   `docs/code-cleanup/MEMORY.md`. Update it when a decision changes.
 - The tool checks itself: `uv run code-cleanup .` must leave no diff and no errors,

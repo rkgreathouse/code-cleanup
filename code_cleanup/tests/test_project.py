@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..project import find_minimum_python, parse_minimum
+from ..project import find_java_release, find_minimum_python, parse_minimum
 
 
 def test_reads_requires_python_from_pyproject(tmp_path: Path) -> None:
@@ -28,3 +28,18 @@ def test_takes_the_lower_bound_of_a_specifier() -> None:
     assert parse_minimum(">=3.10, <4") == (3, 10)
     assert parse_minimum("~=3.12") == (3, 12)
     assert parse_minimum("<4") is None
+
+
+def test_reads_the_java_release_from_the_pom(tmp_path: Path) -> None:
+    pom = tmp_path / "pom.xml"
+    pom.write_text("<properties><maven.compiler.release>25</maven.compiler.release>")
+
+    assert find_java_release(tmp_path) == 25
+
+    pom.write_text("<properties><maven.compiler.target>1.8</maven.compiler.target>")
+
+    assert find_java_release(tmp_path) == 8
+
+
+def test_declares_no_java_release_without_a_pom(tmp_path: Path) -> None:
+    assert find_java_release(tmp_path) is None

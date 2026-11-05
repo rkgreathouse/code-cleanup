@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: bookmarks
+  mvc:
+    problemdetails:
+      enabled: true
+
+bookmarks:
+  page-size: 20
+  max-tags: 10

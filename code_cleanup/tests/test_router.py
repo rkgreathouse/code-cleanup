@@ -15,3 +15,9 @@ def test_routes_ignore_files_by_name() -> None:
     language = route(Path("sub/.gitignore"))
 
     assert language is not None and language.name == "ignore"
+
+
+def test_routes_java_sources() -> None:
+    language = route(Path("src/main/java/A.java"))
+
+    assert language is not None and language.name == "java"

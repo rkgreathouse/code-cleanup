@@ -2,7 +2,9 @@
 # mappings merge key by key, lists and values replace.
 
 # none: file rules only. cli: also the python-style layout (package per tool,
-# __main__.py entry module, errors.py, tests mirroring modules).
+# __main__.py entry module, errors.py, tests mirroring modules). service: also the
+# java-style Spring REST layout (Maven layout, Application entry class, errors
+# package with a @RestControllerAdvice, tests mirroring classes, JSON logs).
 profile: none
 
 exclude:
@@ -20,6 +22,77 @@ exclude:
 file_length:
   warn: 350
   max: 400
+
+# google-java-format formats (2-space indent, 100 columns, no options); then the
+# blank-line rules, our checks, and over the whole project Checkstyle and Error Prone.
+java:
+  # the project's pom.xml (maven.compiler.release, java.version) wins over this
+  release: 21
+
+  # Maven coordinates, resolved once through Maven and cached in ~/.cache/code-cleanup
+  tools:
+    google-java-format: com.google.googlejavaformat:google-java-format:2.0.0
+    checkstyle: com.puppycrawl.tools:checkstyle:14.4.0
+    error-prone: com.google.errorprone:error_prone_core:2.52.0
+
+  spacing:
+    around_blocks: true
+    before_block_comment: true
+    before_catch: true
+
+  checks:
+    allow_javadoc: false
+    allow_environment: false
+    simple_streams: true
+    max_class_constants: 2
+    max_nesting: 4
+
+  # loggers are private static final Logger log = LoggerFactory.getLogger(This.class)
+  logging:
+    check: true
+
+  # Compiles each Maven module's cleaned sources with its own classpath, from
+  # mvn dependency:build-classpath. Severities: "OFF", "WARN", "ERROR" (quoted: YAML
+  # reads a bare OFF as false).
+  error_prone:
+    enabled: true
+    checks:
+      PatternMatchingInstanceof: "WARN"
+
+  # Rendered to a checkstyle.xml; a module with no settings uses Checkstyle's defaults.
+  checkstyle:
+    checker:
+      LineLength:
+        max: 100
+        ignorePattern: "^(package|import) "
+    tree_walker:
+      CyclomaticComplexity:
+        max: 10
+        switchBlockAsSingleDecisionPoint: true
+      AvoidStarImport:
+      IllegalCatch:
+      EmptyCatchBlock:
+      ConstantName:
+        format: "^log$|^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"
+      TypeName:
+      MethodName:
+      MemberName:
+      ParameterName:
+      LocalVariableName:
+      NeedBraces:
+      EqualsHashCode:
+      MissingSwitchDefault:
+      MultipleVariableDeclarations:
+      OneStatementPerLine:
+      InnerAssignment:
+      SimplifyBooleanExpression:
+      SimplifyBooleanReturn:
+      ModifiedControlVariable:
+      VisibilityModifier:
+      Regexp:
+        format: "System\\.(out|err)\\."
+        illegalPattern: true
+        message: "prints to System.out or System.err; log through the class logger"
 
 # .gitignore and .dockerignore: blocks of patterns, each under a # comment
 ignore:

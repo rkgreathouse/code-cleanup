@@ -4,6 +4,7 @@ from pathlib import Path
 
 from .findings import Cleaned, Finding
 from .ignore.clean import clean_ignore
+from .java.clean import check_java_project, clean_java
 from .python.clean import check_python_project, clean_python
 from .settings import Settings
 from .toml.clean import clean_toml
@@ -29,6 +30,13 @@ LANGUAGES = (
         names=(),
         clean=clean_python,
         check_project=check_python_project,
+    ),
+    Language(
+        name="java",
+        suffixes=(".java",),
+        names=(),
+        clean=clean_java,
+        check_project=check_java_project,
     ),
     Language(
         name="toml",

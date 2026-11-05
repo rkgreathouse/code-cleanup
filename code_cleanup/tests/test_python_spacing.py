@@ -15,6 +15,7 @@ def make_settings() -> PythonSettings:
         tight_else=True,
         relative_imports=True,
         allow_docstrings=False,
+        allow_environment=False,
         max_module_constants=2,
         logging_checks=True,
         log_format="%(asctime)s %(levelname)s %(name)s: %(message)s",

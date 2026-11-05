@@ -19,6 +19,7 @@ class PythonSettings:
     tight_else: bool
     relative_imports: bool
     allow_docstrings: bool
+    allow_environment: bool
     max_module_constants: int
     logging_checks: bool
     log_format: str
@@ -123,6 +124,7 @@ def parse_python(raw: dict[str, object], path: Path) -> PythonSettings:
         tight_else=boolean(spacing, "tight_else", path),
         relative_imports=boolean(checks, "relative_imports", path),
         allow_docstrings=boolean(checks, "allow_docstrings", path),
+        allow_environment=boolean(checks, "allow_environment", path),
         max_module_constants=integer(checks, "max_module_constants", path),
         logging_checks=boolean(logs, "check", path),
         log_format=string(logs, "format", path),

@@ -3,8 +3,8 @@
 import argparse
 import sys
 
-from tictactoe.ai import best_move
-from tictactoe.board import InvalidMove, is_full, new_board, place, render, winner
+from .ai import best_move
+from .board import InvalidMove, is_full, new_board, place, render, winner
 
 
 def parse_moves(text: str) -> list[int]:

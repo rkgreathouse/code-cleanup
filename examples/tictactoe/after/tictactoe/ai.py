@@ -2,7 +2,7 @@
 
 from functools import cache
 
-from tictactoe.board import is_full, open_cells, place, winner
+from .board import is_full, open_cells, place, winner
 
 
 def best_move(board: list[str], player: str, opponent: str) -> int:

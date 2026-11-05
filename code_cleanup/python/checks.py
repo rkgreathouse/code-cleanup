@@ -4,14 +4,16 @@ from pathlib import Path
 from ..findings import Finding
 from ..settings import PythonSettings
 
+ENVIRONMENT = {"environ", "environb", "getenv", "getenvb"}
+
 
 def find_style_issues(
     tree: ast.Module, path: Path, settings: PythonSettings
 ) -> list[Finding]:
     findings = []
 
-    if settings.relative_imports:
-        findings += find_absolute_self_imports(tree, path)
+    if not settings.allow_environment:
+        findings += find_environment_reads(tree)
 
     if not settings.allow_docstrings:
         findings += find_docstrings(tree)
@@ -21,54 +23,31 @@ def find_style_issues(
     return findings
 
 
-def find_absolute_self_imports(tree: ast.Module, path: Path) -> list[Finding]:
-    package = find_top_package(path)
-
-    if package is None:
-        return []
-
-    findings = []
-
-    for node in ast.walk(tree):
-        names = imported_modules(node)
-
-        if any(is_inside(name, package) for name in names):
-            findings.append(
-                Finding(
-                    line=node.lineno if isinstance(node, ast.stmt) else 1,
-                    column=1,
-                    code="CC101",
-                    message=f"import from inside the {package} package relatively",
-                    is_error=True,
-                )
-            )
-
-    return findings
+def find_environment_reads(tree: ast.Module) -> list[Finding]:
+    return [
+        Finding(
+            line=node.lineno,
+            column=node.col_offset + 1,
+            code="CC104",
+            message="reads the environment; take it as a flag or from config.yaml",
+            is_error=True,
+        )
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute | ast.ImportFrom) and reads_environment(node)
+    ]
 
 
-def imported_modules(node: ast.AST) -> list[str]:
-    if isinstance(node, ast.Import):
-        return [alias.name for alias in node.names]
+def reads_environment(node: ast.Attribute | ast.ImportFrom) -> bool:
+    if isinstance(node, ast.ImportFrom):
+        return node.module == "os" and any(
+            alias.name in ENVIRONMENT for alias in node.names
+        )
 
-    if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-        return [node.module]
-
-    return []
-
-
-def is_inside(module: str, package: str) -> bool:
-    return module == package or module.startswith(f"{package}.")
-
-
-def find_top_package(path: Path) -> str | None:
-    directory = path.resolve().parent
-    package = None
-
-    while (directory / "__init__.py").is_file():
-        package = directory.name
-        directory = directory.parent
-
-    return package
+    return (
+        isinstance(node.value, ast.Name)
+        and node.value.id == "os"
+        and node.attr in ENVIRONMENT
+    )
 
 
 def find_docstrings(tree: ast.Module) -> list[Finding]:

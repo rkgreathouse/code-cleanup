@@ -4,6 +4,7 @@ from pathlib import Path
 from ..findings import Cleaned, Finding
 from ..settings import Settings
 from .checks import find_style_issues
+from .imports import find_absolute_self_imports, relativize_imports
 from .layout import find_layout_issues
 from .logs import find_logging_issues
 from .mypy import find_type_errors
@@ -20,12 +21,17 @@ def clean_python(text: str, path: Path, settings: Settings) -> Cleaned:
     except SyntaxError as error:
         return Cleaned(text=text, findings=(to_syntax_finding(error),))
 
-    fixed = fix_lint(text, path, python)
+    relative = relativize_imports(text, path) if python.relative_imports else text
+    fixed = fix_lint(relative, path, python)
     formatted = format_code(fixed, path, python)
     spaced = space_blocks(formatted, python)
     findings = find_lint(spaced, path, python)
     tree = ast.parse(spaced)
     findings += find_style_issues(tree, path, python)
+
+    if python.relative_imports:
+        findings += find_absolute_self_imports(tree, path)
+
     findings += find_logging_issues(tree, path, python)
 
     return Cleaned(text=spaced, findings=tuple(findings))

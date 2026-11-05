@@ -2,14 +2,17 @@
 
 EMPTY = " "
 WINNING_LINES = [
+    # rows
     (0, 1, 2),
     (3, 4, 5),
-    (6, 7, 8),  # rows
+    (6, 7, 8),
+    # columns
     (0, 3, 6),
     (1, 4, 7),
-    (2, 5, 8),  # columns
+    (2, 5, 8),
+    # diagonals
     (0, 4, 8),
-    (2, 4, 6),  # diagonals
+    (2, 4, 6),
 ]
 
 
@@ -24,7 +27,6 @@ def new_board() -> list[str]:
 
 def place(board: list[str], cell: int, player: str) -> list[str]:
     """Return a new board with `player` placed in `cell` (0-8)."""
-
     if not 0 <= cell < 9:
         raise InvalidMove(f"cell {cell + 1} is off the board")
 
@@ -38,7 +40,6 @@ def place(board: list[str], cell: int, player: str) -> list[str]:
 
 def winner(board: list[str]) -> str | None:
     """Return the winning player's mark, or None if nobody has won."""
-
     for a, b, c in WINNING_LINES:
         if board[a] != EMPTY and board[a] == board[b] == board[c]:
             return board[a]

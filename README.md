@@ -49,6 +49,7 @@ so a project's own ruff settings never change the result.
 | `CC001` | file over 350 lines (warning) or 400 lines (error) |
 | `CC101` | a package imports itself absolutely; use `from .module import name` |
 | `CC102` | more than two UPPER_CASE module constants; move the rest to config |
+| `CC103` | a docstring; names and small functions carry the meaning (`allow_docstrings: true` to permit) |
 | others | ruff rule codes |
 
 Warnings never fail a run. Errors fail both modes; `--check` also fails when any

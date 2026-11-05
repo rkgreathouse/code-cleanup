@@ -21,7 +21,6 @@ def best_move(board: list[str], player: str, opponent: str) -> int:
 @cache
 def _negamax(board: tuple[str, ...], player: str, opponent: str) -> int:
     """Score the position for `player`, who is about to move: 1 win, 0 draw, -1 loss."""
-
     if winner(list(board)) == opponent:
         return -1
 

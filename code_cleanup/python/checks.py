@@ -13,6 +13,9 @@ def find_style_issues(
     if settings.relative_imports:
         findings += find_absolute_self_imports(tree, path)
 
+    if not settings.allow_docstrings:
+        findings += find_docstrings(tree)
+
     findings += find_extra_constants(tree, settings.max_module_constants)
 
     return findings
@@ -66,6 +69,22 @@ def find_top_package(path: Path) -> str | None:
         directory = directory.parent
 
     return package
+
+
+def find_docstrings(tree: ast.Module) -> list[Finding]:
+    owners = (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
+
+    return [
+        Finding(
+            line=node.body[0].lineno,
+            column=node.body[0].col_offset + 1,
+            code="CC103",
+            message="docstring; let names and small functions carry the meaning",
+            is_error=True,
+        )
+        for node in ast.walk(tree)
+        if isinstance(node, owners) and ast.get_docstring(node, clean=False) is not None
+    ]
 
 
 def find_extra_constants(tree: ast.Module, limit: int) -> list[Finding]:

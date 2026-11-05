@@ -16,6 +16,7 @@ class PythonSettings:
     blank_line_before_except: bool
     tight_else: bool
     relative_imports: bool
+    allow_docstrings: bool
     max_module_constants: int
 
 
@@ -104,6 +105,7 @@ def parse_python(raw: dict[str, object], path: Path) -> PythonSettings:
         blank_line_before_except=boolean(spacing, "before_except", path),
         tight_else=boolean(spacing, "tight_else", path),
         relative_imports=boolean(checks, "relative_imports", path),
+        allow_docstrings=boolean(checks, "allow_docstrings", path),
         max_module_constants=integer(checks, "max_module_constants", path),
     )
 

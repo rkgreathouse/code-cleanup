@@ -12,6 +12,7 @@ def make_settings() -> PythonSettings:
         blank_line_before_except=True,
         tight_else=True,
         relative_imports=True,
+        allow_docstrings=False,
         max_module_constants=2,
     )
 
@@ -83,3 +84,9 @@ def test_is_idempotent() -> None:
     once = space_blocks(source, make_settings())
 
     assert space_blocks(once, make_settings()) == once
+
+
+def test_treats_a_docstring_as_part_of_the_header() -> None:
+    source = 'def f(x):\n    """Doc."""\n    if x:\n        pass\n'
+
+    assert space_blocks(source, make_settings()) == source

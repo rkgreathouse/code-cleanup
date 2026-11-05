@@ -89,11 +89,12 @@ def find_block_gaps(
             first_line(statement), statement.col_offset, comment_lines, lines
         )
         is_block = isinstance(statement, BLOCKS)
+        opens_body = index == 0 or (index == 1 and is_docstring(body[0]))
         follows_block = index > 0 and isinstance(body[index - 1], BLOCKS)
         has_comment = start < first_line(statement)
 
         if (
-            index > 0
+            not opens_body
             and settings.blank_lines_around_blocks
             and (is_block or follows_block)
         ):
@@ -101,7 +102,7 @@ def find_block_gaps(
 
         # ruff format deletes a blank line that opens a block; a comment there keeps one
         if (
-            index == 0
+            opens_body
             and is_block
             and has_comment
             and settings.blank_line_before_block_comment
@@ -109,6 +110,14 @@ def find_block_gaps(
             gaps.add(start)
 
     return gaps
+
+
+def is_docstring(statement: ast.stmt) -> bool:
+    return (
+        isinstance(statement, ast.Expr)
+        and isinstance(statement.value, ast.Constant)
+        and isinstance(statement.value.value, str)
+    )
 
 
 def find_handler_lines(

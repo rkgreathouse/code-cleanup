@@ -24,6 +24,7 @@ class PythonSettings:
 
 @dataclass(frozen=True, slots=True)
 class Settings:
+    profile: str
     exclude: tuple[str, ...]
     warn_lines: int
     max_lines: int
@@ -82,12 +83,17 @@ def merge(base: dict[str, object], override: dict[str, object]) -> dict[str, obj
 
 def parse_settings(raw: dict[str, object], path: Path) -> Settings:
     exclude = raw.get("exclude")
+    profile = raw.get("profile")
     file_length = section(raw, "file_length", path)
+
+    if profile not in ("none", "cli"):
+        raise ConfigError(f"{path}: profile must be none or cli, not {profile!r}")
 
     if not isinstance(exclude, list):
         raise ConfigError(f"{path}: exclude must be a list")
 
     return Settings(
+        profile=str(profile),
         exclude=tuple(str(name) for name in exclude),
         warn_lines=integer(file_length, "warn", path),
         max_lines=integer(file_length, "max", path),

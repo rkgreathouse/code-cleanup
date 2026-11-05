@@ -4,6 +4,7 @@ from pathlib import Path
 from ..findings import Cleaned, Finding
 from ..settings import Settings
 from .checks import find_style_issues
+from .layout import find_layout_issues
 from .mypy import find_type_errors
 from .ruff import find_lint, fix_lint, format_code
 from .spacing import space_blocks
@@ -42,8 +43,13 @@ def check_python_project(
 ) -> dict[Path, list[Finding]]:
     # a file that does not parse is already reported, and would stop mypy outright
     parsed = {path: text for path, text in texts.items() if parses(text)}
+    type_errors = find_type_errors(root, parsed, settings.python)
+    layout = find_layout_issues(root, parsed) if settings.profile == "cli" else {}
 
-    return find_type_errors(root, parsed, settings.python)
+    return {
+        path: [*type_errors.get(path, []), *layout.get(path, [])]
+        for path in type_errors.keys() | layout.keys()
+    }
 
 
 def parses(text: str) -> bool:

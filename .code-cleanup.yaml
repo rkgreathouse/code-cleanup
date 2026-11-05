@@ -1,3 +1,5 @@
+profile: cli
+
 # examples/ holds code as written before cleaning; tests compare it, the repo check skips it
 exclude:
   - .git

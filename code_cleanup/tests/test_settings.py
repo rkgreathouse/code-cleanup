@@ -45,3 +45,10 @@ def test_merge_replaces_lists_and_merges_mappings() -> None:
     base: dict[str, object] = {"a": {"b": 1, "c": 2}, "d": [1, 2]}
 
     assert merge(base, {"a": {"c": 3}, "d": [9]}) == {"a": {"b": 1, "c": 3}, "d": [9]}
+
+
+def test_profile_must_be_known(tmp_path: Path) -> None:
+    (tmp_path / ".code-cleanup.yaml").write_text("profile: webapp\n")
+
+    with pytest.raises(ConfigError, match="profile must be none or cli"):
+        load_settings(tmp_path, None)

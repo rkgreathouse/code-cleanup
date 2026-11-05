@@ -1,6 +1,10 @@
 # The house style. A project overrides any key from .code-cleanup.yaml at its root:
 # mappings merge key by key, lists and values replace.
 
+# none: file rules only. cli: also the python-style layout (package per tool,
+# __main__.py entry module, errors.py, tests mirroring modules).
+profile: none
+
 exclude:
   - .git
   - .venv

@@ -16,6 +16,8 @@ def make_settings() -> PythonSettings:
         relative_imports=True,
         allow_docstrings=False,
         allow_environment=False,
+        simple_comprehensions=True,
+        suggest_walrus=True,
         max_module_constants=2,
         logging_checks=True,
         log_format="%(asctime)s %(levelname)s %(name)s: %(message)s",

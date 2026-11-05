@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from ..findings import Finding
 from ..python.layout import find_layout_issues
 
 ENTRY = """import argparse
@@ -34,9 +35,13 @@ def codes(root: Path, texts: dict[Path, str]) -> dict[str, list[str]]:
     issues = find_layout_issues(root, texts)
 
     return {
-        path.relative_to(root).as_posix(): [finding.code for finding in findings]
+        path.relative_to(root).as_posix(): codes_of(findings)
         for path, findings in sorted(issues.items())
     }
+
+
+def codes_of(findings: list[Finding]) -> list[str]:
+    return [finding.code for finding in findings]
 
 
 def test_a_tool_shaped_like_the_skill_passes(tmp_path: Path) -> None:

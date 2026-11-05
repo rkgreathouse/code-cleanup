@@ -20,6 +20,8 @@ class PythonSettings:
     relative_imports: bool
     allow_docstrings: bool
     allow_environment: bool
+    simple_comprehensions: bool
+    suggest_walrus: bool
     max_module_constants: int
     logging_checks: bool
     log_format: str
@@ -159,6 +161,8 @@ def parse_python(raw: dict[str, object], path: Path) -> PythonSettings:
         relative_imports=boolean(checks, "relative_imports", path),
         allow_docstrings=boolean(checks, "allow_docstrings", path),
         allow_environment=boolean(checks, "allow_environment", path),
+        simple_comprehensions=boolean(checks, "simple_comprehensions", path),
+        suggest_walrus=boolean(checks, "suggest_walrus", path),
         max_module_constants=integer(checks, "max_module_constants", path),
         logging_checks=boolean(logs, "check", path),
         log_format=string(logs, "format", path),

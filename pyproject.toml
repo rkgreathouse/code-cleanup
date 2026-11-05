@@ -56,6 +56,9 @@ select = [
     "ERA",
     "G",
     "LOG",
+    "C4",
+    "PERF401",
+    "PERF403",
     "PLW0603",
     "PLR1702",
 ]

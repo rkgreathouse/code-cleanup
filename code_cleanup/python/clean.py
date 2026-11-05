@@ -4,6 +4,7 @@ from pathlib import Path
 from ..findings import Cleaned, Finding
 from ..settings import Settings
 from .checks import find_style_issues
+from .idioms import find_idiom_issues
 from .imports import find_absolute_self_imports, relativize_imports
 from .layout import find_layout_issues
 from .logs import find_logging_issues
@@ -33,6 +34,7 @@ def clean_python(text: str, path: Path, settings: Settings) -> Cleaned:
         findings += find_absolute_self_imports(tree, path)
 
     findings += find_logging_issues(tree, path, python)
+    findings += find_idiom_issues(tree, python)
 
     return Cleaned(text=spaced, findings=tuple(findings))
 

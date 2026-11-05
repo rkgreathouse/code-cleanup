@@ -8,7 +8,7 @@ from ..settings import Settings
 def clean_ignore(text: str, path: Path, settings: Settings) -> Cleaned:
     lines = [strip_trailing(line) for line in text.splitlines()]
     blocks = drop_repeats(split_blocks(lines))
-    blocks = [[space_comment(line) for line in block] for block in blocks]
+    blocks = [space_comments(block) for block in blocks]
 
     if settings.ignore.sort_blocks:
         blocks = [sort_block(block) for block in blocks]
@@ -70,6 +70,10 @@ def drop_repeats(blocks: list[list[str]]) -> list[list[str]]:
             kept.append(lines)
 
     return kept
+
+
+def space_comments(block: list[str]) -> list[str]:
+    return [space_comment(line) for line in block]
 
 
 def sort_block(block: list[str]) -> list[str]:

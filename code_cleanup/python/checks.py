@@ -67,12 +67,14 @@ def find_docstrings(tree: ast.Module) -> list[Finding]:
 
 
 def find_extra_constants(tree: ast.Module, limit: int) -> list[Finding]:
-    constants = [
-        (node.lineno, name)
-        for node in tree.body
-        for name in assigned_names(node)
-        if name.isupper() and not name.startswith("__")
-    ]
+    constants = []
+
+    for node in tree.body:
+        constants += [
+            (node.lineno, name)
+            for name in assigned_names(node)
+            if name.isupper() and not name.startswith("__")
+        ]
 
     return [
         Finding(

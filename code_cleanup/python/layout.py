@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-from ..findings import Finding
+from ..findings import Finding, group_by_path
 
 SHARED_PACKAGE = "utils"
 MAIN_GUARD = 'if __name__ == "__main__":\n    raise SystemExit(main())'
@@ -23,10 +23,7 @@ def find_layout_issues(root: Path, texts: dict[Path, str]) -> dict[Path, list[Fi
         issues += check_entry_module(root / tool, trees)
         issues += check_errors_module(root / tool, trees)
 
-    return {
-        path: [finding for issue_path, finding in issues if issue_path == path]
-        for path in {path for path, _ in issues}
-    }
+    return group_by_path(issues)
 
 
 def find_packages(root: Path, trees: dict[Path, ast.Module]) -> set[str]:
@@ -147,9 +144,7 @@ def check_main_function(tree: ast.Module) -> list[tuple[int, str]]:
 
 
 def check_options(tree: ast.Module) -> list[tuple[int, str]]:
-    uses_argparse = "argparse" in {
-        name for node in tree.body for name in imported_names(node)
-    }
+    uses_argparse = any("argparse" in imported_names(node) for node in tree.body)
     options = next(
         (
             node

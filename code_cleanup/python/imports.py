@@ -50,9 +50,12 @@ def find_absolute_self_imports(tree: ast.Module, path: Path) -> list[Finding]:
             is_error=True,
         )
         for node in ast.walk(tree)
-        if isinstance(node, ast.stmt)
-        and any(is_inside(name, package[0]) for name in imported_modules(node))
+        if isinstance(node, ast.stmt) and imports_package(node, package[0])
     ]
+
+
+def imports_package(node: ast.stmt, package: str) -> bool:
+    return any(is_inside(name, package) for name in imported_modules(node))
 
 
 def imported_modules(node: ast.AST) -> list[str]:

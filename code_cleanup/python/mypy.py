@@ -4,7 +4,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from ..findings import Finding
+from ..findings import Finding, group_by_path
 from ..settings import PythonSettings
 
 
@@ -19,9 +19,7 @@ def find_type_errors(
         write_mirror(mirror, root, texts, settings.mypy_ini)
         result = run_mypy(mirror, root, sorted(texts))
 
-    failure = find_failure(result)
-
-    if failure is not None:
+    if (failure := find_failure(result)) is not None:
         return {root: [Finding(1, 1, "mypy", failure, is_error=True)]}
 
     return group_by_file(result.stdout, root)
@@ -75,12 +73,10 @@ def group_by_file(output: str, root: Path) -> dict[Path, list[Finding]]:
 
     # notes only elaborate on the error before them
     errors = [entry for entry in entries if entry.get("severity") == "error"]
-    paths = {root / entry["file"] for entry in errors}
 
-    return {
-        path: [to_finding(entry) for entry in errors if root / entry["file"] == path]
-        for path in paths
-    }
+    return group_by_path(
+        [(root / entry["file"], to_finding(entry)) for entry in errors]
+    )
 
 
 def to_finding(entry: dict[str, object]) -> Finding:

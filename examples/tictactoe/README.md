@@ -32,10 +32,9 @@ The tool fixed what is safe to fix and listed the rest for a person to decide:
 
 | Code | What it wants | Why it was not fixed automatically |
 |---|---|---|
-| `CC101` | `from .board import ...` inside the package | not yet auto-fixed; planned |
 | `CC103` | no docstrings: names and small functions carry the meaning | deleting prose is a person's call |
 | `B904` | `raise ... from error` inside `except` | changes the traceback, so a person chooses |
-| `ANN001` | a type for `argv` | the tool cannot know the intended type |
+| `ANN001`, `mypy:no-untyped-def` | a type for `argv` (ruff and mypy both see it) | the tool cannot know the intended type |
 | `N818` | `InvalidMove` renamed `InvalidMoveError` | a rename touches every caller |
 
 ## What changed
@@ -52,6 +51,7 @@ The tool fixed what is safe to fix and listed the rest for a person to decide:
 
 ### `ai.py`
 
+- `from tictactoe.board import ...` became `from .board import ...`.
 - `@lru_cache(maxsize=None)` became `@cache`.
 - Blank lines around blocks. A docstring counts as part of the function header, so
   no blank line is added between it and the first `if`.
@@ -60,6 +60,7 @@ The tool fixed what is safe to fix and listed the rest for a person to decide:
 
 ### `__main__.py`
 
+- `from tictactoe.ai` / `from tictactoe.board` became `from .ai` / `from .board`.
 - `if` / `elif` / `else` chains that all `return` became flat `if` guards.
 - Blank lines around blocks and between `try` and `except`.
 

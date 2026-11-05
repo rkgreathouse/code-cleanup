@@ -33,6 +33,7 @@ exclude = ["code_cleanup/tests"]
 [tool.ruff]
 target-version = "py314"
 line-length = 88
+extend-exclude = ["examples"]
 
 [tool.ruff.lint]
 preview = true
@@ -58,6 +59,7 @@ max-nested-blocks = 4
 [tool.mypy]
 strict = true
 python_version = "3.14"
+exclude = ["^examples/"]
 
 [tool.pytest.ini_options]
 testpaths = ["code_cleanup/tests"]

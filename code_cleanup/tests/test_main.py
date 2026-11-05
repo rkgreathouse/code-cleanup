@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 import pytest
@@ -34,3 +35,14 @@ def test_unknown_report_is_a_usage_error(tmp_path: Path) -> None:
         main([str(tmp_path), "--report", "xml"])
 
     assert raised.value.code == 2
+
+
+def test_example_before_cleans_to_example_after(tmp_path: Path) -> None:
+    example = Path(__file__).parents[2] / "examples" / "tictactoe"
+    shutil.copytree(example / "before", tmp_path, dirs_exist_ok=True)
+
+    main([str(tmp_path)])
+
+    for expected in sorted((example / "after").rglob("*.py")):
+        cleaned = tmp_path / expected.relative_to(example / "after")
+        assert cleaned.read_text() == expected.read_text(), cleaned.name

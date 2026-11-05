@@ -22,6 +22,8 @@ files no plugin claims are skipped.
 | Java, TypeScript, Kotlin | next, built on the Python rules |
 | YAML (Spring config), log4j, ignore files | planned |
 
+See [examples/tictactoe](examples/tictactoe/) for a real before/after run with screenshots.
+
 ## What the Python plugin does
 
 In order, on each `.py` / `.pyi` file:

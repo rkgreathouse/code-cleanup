@@ -19,13 +19,24 @@ def find_type_errors(
         write_mirror(mirror, root, texts, settings.mypy_ini)
         result = run_mypy(mirror, root, sorted(texts))
 
-    # exit 2 is a blocking error (duplicate module names, bad config): one finding
-    if result.returncode > 1:
-        detail = (result.stderr or result.stdout).strip().splitlines()
-        message = detail[0] if detail else "mypy stopped without a message"
-        return {root: [Finding(1, 1, "mypy", message, is_error=True)]}
+    failure = find_failure(result)
+
+    if failure is not None:
+        return {root: [Finding(1, 1, "mypy", failure, is_error=True)]}
 
     return group_by_file(result.stdout, root)
+
+
+def find_failure(result: subprocess.CompletedProcess[str]) -> str | None:
+    has_report = any(line.startswith("{") for line in result.stdout.splitlines())
+    detail = (result.stderr or result.stdout).strip().splitlines()
+
+    # exit 2 is a blocking error (duplicate names, bad config); exit 1 with no report
+    # means mypy itself could not run; either way the files went unchecked
+    if result.returncode > 1 or (result.returncode == 1 and not has_report):
+        return detail[0] if detail else "mypy stopped without a message"
+
+    return None
 
 
 def write_mirror(mirror: Path, root: Path, texts: dict[Path, str], ini: str) -> None:

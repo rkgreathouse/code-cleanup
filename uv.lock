@@ -75,6 +75,7 @@ name = "code-cleanup"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "mypy" },
     { name = "pyyaml" },
     { name = "ruff" },
     { name = "taplo" },
@@ -82,13 +83,13 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "mypy" },
     { name = "pytest" },
     { name = "types-pyyaml" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", specifier = "==2.4.1" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "ruff", specifier = "==0.17.3" },
     { name = "taplo", specifier = "==0.9.3" },
@@ -96,7 +97,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = ">=2.4" },
     { name = "pytest", specifier = ">=9.2" },
     { name = "types-pyyaml", specifier = ">=6.0" },
 ]

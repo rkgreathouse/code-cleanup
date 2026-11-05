@@ -1,7 +1,8 @@
 from dataclasses import replace
 from pathlib import Path
+from subprocess import CompletedProcess
 
-from ..python.mypy import find_type_errors
+from ..python.mypy import find_failure, find_type_errors
 from ..settings import load_settings
 
 
@@ -40,3 +41,11 @@ def test_can_be_switched_off(tmp_path: Path) -> None:
         find_type_errors(tmp_path, {tmp_path / "a.py": "x: int = 'a'\n"}, settings)
         == {}
     )
+
+
+def test_a_mypy_that_cannot_run_is_reported_not_skipped() -> None:
+    missing = CompletedProcess([], 1, stdout="", stderr="No module named mypy\n")
+    found = CompletedProcess([], 1, stdout='{"file": "a.py"}\n', stderr="")
+
+    assert find_failure(missing) == "No module named mypy"
+    assert find_failure(found) is None

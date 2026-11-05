@@ -33,6 +33,12 @@ python:
     allow_docstrings: false
     max_module_constants: 2
 
+  # basicConfig only in __main__.py, with this format; loggers named for their module
+  logging:
+    check: true
+    format: "%(asctime)s %(levelname)s %(name)s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
   # Runs once over the cleaned files, after ruff; uses ROOT/.venv for third-party
   # packages when it exists.
   mypy:
@@ -49,7 +55,7 @@ python:
     lint.preview: true
     lint.explicit-preview-rules: true
     lint.select:
-      [E, W, F, I, N, UP, B, SIM, PTH, RET, ANN, T20, TID, C90, ERA, PLW0603, PLR1702]
+      [E, W, F, I, N, UP, B, SIM, PTH, RET, ANN, T20, TID, C90, ERA, G, LOG, PLW0603, PLR1702]
     lint.ignore: [TID252]
     lint.mccabe.max-complexity: 10
     lint.pylint.max-nested-blocks: 4

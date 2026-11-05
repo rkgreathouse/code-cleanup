@@ -5,6 +5,7 @@ from ..findings import Cleaned, Finding
 from ..settings import Settings
 from .checks import find_style_issues
 from .layout import find_layout_issues
+from .logs import find_logging_issues
 from .mypy import find_type_errors
 from .ruff import find_lint, fix_lint, format_code
 from .spacing import space_blocks
@@ -23,7 +24,9 @@ def clean_python(text: str, path: Path, settings: Settings) -> Cleaned:
     formatted = format_code(fixed, path, python)
     spaced = space_blocks(formatted, python)
     findings = find_lint(spaced, path, python)
-    findings += find_style_issues(ast.parse(spaced), path, python)
+    tree = ast.parse(spaced)
+    findings += find_style_issues(tree, path, python)
+    findings += find_logging_issues(tree, path, python)
 
     return Cleaned(text=spaced, findings=tuple(findings))
 

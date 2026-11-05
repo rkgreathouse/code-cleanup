@@ -16,6 +16,9 @@ def make_settings() -> PythonSettings:
         relative_imports=True,
         allow_docstrings=False,
         max_module_constants=2,
+        logging_checks=True,
+        log_format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        log_datefmt="%Y-%m-%d %H:%M:%S",
     )
 
 

@@ -20,6 +20,9 @@ class PythonSettings:
     relative_imports: bool
     allow_docstrings: bool
     max_module_constants: int
+    logging_checks: bool
+    log_format: str
+    log_datefmt: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -107,6 +110,7 @@ def parse_python(raw: dict[str, object], path: Path) -> PythonSettings:
     ruff = section(raw, "ruff", path)
     mypy = section(raw, "mypy", path)
     mypy_config = section(mypy, "config", path)
+    logs = section(raw, "logging", path)
 
     return PythonSettings(
         ruff_toml="".join(f"{key} = {to_toml(value)}\n" for key, value in ruff.items()),
@@ -120,6 +124,9 @@ def parse_python(raw: dict[str, object], path: Path) -> PythonSettings:
         relative_imports=boolean(checks, "relative_imports", path),
         allow_docstrings=boolean(checks, "allow_docstrings", path),
         max_module_constants=integer(checks, "max_module_constants", path),
+        logging_checks=boolean(logs, "check", path),
+        log_format=string(logs, "format", path),
+        log_datefmt=string(logs, "datefmt", path),
     )
 
 
@@ -147,5 +154,14 @@ def integer(raw: dict[str, object], key: str, path: Path) -> int:
     # bool is a subclass of int, and "max: true" is a typo, not a limit of 1
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigError(f"{path}: {key} must be an integer")
+
+    return value
+
+
+def string(raw: dict[str, object], key: str, path: Path) -> str:
+    value = raw.get(key)
+
+    if not isinstance(value, str):
+        raise ConfigError(f"{path}: {key} must be a string")
 
     return value

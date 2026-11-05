@@ -1,0 +1,47 @@
+# The house style. A project overrides any key from .code-cleanup.yaml at its root:
+# mappings merge key by key, lists and values replace.
+
+exclude:
+  - .git
+  - .venv
+  - venv
+  - node_modules
+  - __pycache__
+  - build
+  - dist
+  - target
+  - .gradle
+  - .idea
+
+file_length:
+  warn: 350
+  max: 400
+
+python:
+  spacing:
+    around_blocks: true
+    before_block_comment: true
+    before_except: true
+    tight_else: true
+
+  checks:
+    relative_imports: true
+    max_module_constants: 2
+
+  # Passed to ruff as --config overrides, in isolated mode, so a project's own ruff
+  # settings never change the result.
+  ruff:
+    target-version: py314
+    line-length: 88
+    lint.preview: true
+    lint.explicit-preview-rules: true
+    lint.select:
+      [E, W, F, I, N, UP, B, SIM, PTH, RET, ANN, T20, TID, C90, ERA, PLW0603, PLR1702]
+    lint.ignore: [TID252]
+    lint.mccabe.max-complexity: 10
+    lint.pylint.max-nested-blocks: 4
+    lint.flake8-tidy-imports.banned-api:
+      argparse:
+        msg: Only the entry module (__main__.py) parses arguments.
+    lint.per-file-ignores:
+      "**/__main__.py": [T201, TID251]

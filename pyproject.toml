@@ -1,0 +1,85 @@
+[project]
+name = "code-cleanup"
+version = "0.1.0"
+description = "One deterministic house style for every file in a repo, routed by language."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.14"
+dependencies = ["mypy==2.4.1", "pyyaml>=6.0", "ruff==0.17.3", "taplo==0.9.3"]
+classifiers = [
+    "Environment :: Console",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.scripts]
+code-cleanup = "code_cleanup.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/rkgreathouse/code-cleanup"
+
+[dependency-groups]
+dev = ["pytest>=9.2", "types-pyyaml>=6.0"]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["code_cleanup"]
+exclude = ["code_cleanup/tests"]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+extend-exclude = ["examples"]
+
+[tool.ruff.lint]
+preview = true
+explicit-preview-rules = true
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "SIM",
+    "PTH",
+    "RET",
+    "ANN",
+    "T20",
+    "TID",
+    "C90",
+    "ERA",
+    "G",
+    "LOG",
+    "C4",
+    "PERF401",
+    "PERF403",
+    "PLW0603",
+    "PLR1702",
+]
+ignore = ["TID252"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-nested-blocks = 4
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"argparse".msg = "Only the entry module (__main__.py) parses arguments."
+
+[tool.ruff.lint.per-file-ignores]
+"**/__main__.py" = ["T201", "TID251"]
+
+[tool.mypy]
+strict = true
+python_version = "3.14"
+exclude = ["^examples/"]
+
+[tool.pytest.ini_options]
+testpaths = ["code_cleanup/tests"]

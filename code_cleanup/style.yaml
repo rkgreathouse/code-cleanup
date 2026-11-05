@@ -1,0 +1,82 @@
+# The house style. A project overrides any key from .code-cleanup.yaml at its root:
+# mappings merge key by key, lists and values replace.
+
+# none: file rules only. cli: also the python-style layout (package per tool,
+# __main__.py entry module, errors.py, tests mirroring modules).
+profile: none
+
+exclude:
+  - .git
+  - .venv
+  - venv
+  - node_modules
+  - __pycache__
+  - build
+  - dist
+  - target
+  - .gradle
+  - .idea
+
+file_length:
+  warn: 350
+  max: 400
+
+# .gitignore and .dockerignore: blocks of patterns, each under a # comment
+ignore:
+  sort_blocks: true
+  require_headers: true
+
+# taplo formats; then a blank line goes above every [table] and its comments
+toml:
+  blank_line_before_tables: true
+  taplo:
+    indent_string: "    "
+    column_width: 88
+    allowed_blank_lines: 1
+
+python:
+  spacing:
+    around_blocks: true
+    before_block_comment: true
+    before_except: true
+    tight_else: true
+
+  checks:
+    relative_imports: true
+    allow_docstrings: false
+    allow_environment: false
+    simple_comprehensions: true
+    suggest_walrus: true
+    max_module_constants: 2
+
+  # basicConfig only in __main__.py, with this format; loggers named for their module
+  logging:
+    check: true
+    format: "%(asctime)s %(levelname)s %(name)s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+  # Runs once over the cleaned files, after ruff; uses ROOT/.venv for third-party
+  # packages when it exists.
+  mypy:
+    enabled: true
+    config:
+      strict: true
+      python_version: "3.14"
+
+  # Written to a generated ruff.toml passed with --config, so a project's own ruff
+  # settings never change the result.
+  ruff:
+    target-version: py314
+    line-length: 88
+    lint.preview: true
+    lint.explicit-preview-rules: true
+    lint.select:
+      [E, W, F, I, N, UP, B, SIM, PTH, RET, ANN, T20, TID, C90, ERA, G, LOG, C4, PERF401, PERF403, PLW0603, PLR1702]
+    lint.ignore: [TID252]
+    lint.mccabe.max-complexity: 10
+    lint.pylint.max-nested-blocks: 4
+    lint.flake8-tidy-imports.banned-api:
+      argparse:
+        msg: Only the entry module (__main__.py) parses arguments.
+    lint.per-file-ignores:
+      "**/__main__.py": [T201, TID251]

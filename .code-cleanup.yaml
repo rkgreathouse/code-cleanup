@@ -1,0 +1,15 @@
+profile: cli
+
+# examples/ holds code as written before cleaning; tests compare it, the repo check skips it
+exclude:
+  - .git
+  - .venv
+  - venv
+  - node_modules
+  - __pycache__
+  - build
+  - dist
+  - target
+  - .gradle
+  - .idea
+  - examples

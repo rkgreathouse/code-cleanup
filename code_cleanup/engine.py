@@ -72,7 +72,7 @@ def check_projects(
             item.path: item.text for item in files if item.language == language.name
         }
 
-        if not texts:
+        if not texts or language.check_project is None:
             continue
 
         for path, findings in language.check_project(root, texts, settings).items():

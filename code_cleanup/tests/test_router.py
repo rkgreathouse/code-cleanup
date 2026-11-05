@@ -9,3 +9,9 @@ def test_routes_python_sources_and_stubs() -> None:
 
 def test_skips_languages_without_a_plugin() -> None:
     assert route(Path("README.md")) is None
+
+
+def test_routes_ignore_files_by_name() -> None:
+    language = route(Path("sub/.gitignore"))
+
+    assert language is not None and language.name == "ignore"

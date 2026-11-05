@@ -27,12 +27,19 @@ class PythonSettings:
 
 
 @dataclass(frozen=True, slots=True)
+class IgnoreSettings:
+    sort_blocks: bool
+    require_headers: bool
+
+
+@dataclass(frozen=True, slots=True)
 class Settings:
     profile: str
     exclude: tuple[str, ...]
     warn_lines: int
     max_lines: int
     python: PythonSettings
+    ignore: IgnoreSettings
 
 
 def load_settings(root: Path, config_path: Path | None) -> Settings:
@@ -102,6 +109,14 @@ def parse_settings(raw: dict[str, object], path: Path) -> Settings:
         warn_lines=integer(file_length, "warn", path),
         max_lines=integer(file_length, "max", path),
         python=parse_python(section(raw, "python", path), path),
+        ignore=parse_ignore(section(raw, "ignore", path), path),
+    )
+
+
+def parse_ignore(raw: dict[str, object], path: Path) -> IgnoreSettings:
+    return IgnoreSettings(
+        sort_blocks=boolean(raw, "sort_blocks", path),
+        require_headers=boolean(raw, "require_headers", path),
     )
 
 

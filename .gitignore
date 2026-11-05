@@ -1,6 +1,7 @@
-__pycache__/
-.venv/
+# Python caches, environment and build output
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
+.venv/
+__pycache__/
 dist/

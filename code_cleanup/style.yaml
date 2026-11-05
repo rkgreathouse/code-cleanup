@@ -21,6 +21,11 @@ file_length:
   warn: 350
   max: 400
 
+# .gitignore and .dockerignore: blocks of patterns, each under a # comment
+ignore:
+  sort_blocks: true
+  require_headers: true
+
 python:
   spacing:
     around_blocks: true
